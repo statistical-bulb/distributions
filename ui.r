@@ -10,27 +10,34 @@ library(shiny)
 ui = fluidPage(
   tabsetPanel(
     tabPanel("Binomial", fluid = TRUE,
+             
+             titlePanel("Binomial distribution B(n, p)"),
              sidebarLayout(
                sidebarPanel(
                  sliderInput(inputId = "binom_n",
-                             label = "Size",
+                             label = "Size n",
                              min = 1,
                              max = 300,
                              value = 30),
                  sliderInput(inputId = "binom_p",
-                             label = "Probability",
+                             label = "Probability p",
                              min = 0,
                              max = 1,
                              value = 0.5),
                  checkboxInput(inputId = "binom_checkbox",
-                               label = strong("Show normal approximation (red)"),
+                               label = strong("Show normal approximation (green)"),
                                value = FALSE),
                  br(),
                  br(),
                  actionButton("reset_binom", "Reset")
                ),
                mainPanel(
-                 plotOutput(outputId = "dist_binomial")
+                 fluidRow(
+                   verticalLayout( 
+                     plotOutput(outputId = "dist_binomial"),
+                     DT::dataTableOutput("binomial_table")
+                   )
+                 )
                )
              )
     ),
@@ -52,9 +59,18 @@ ui = fluidPage(
                  br(),
                  actionButton("reset_normal", "Reset")
                ),
-               mainPanel(
-                 plotOutput(outputId = "dist_normal")
+               mainPanel(fluidRow(
+                 verticalLayout( 
+                   plotOutput("dist_normal1"), 
+                   plotOutput("dist_normal2"),
+                   div(textOutput("dist_normal_txt"), 
+                       align = "center", 
+                       style = "font-size:75%;")
+                 )
                )
+               )
+               
+               
              )
     ),
     tabPanel("Normal (area)", fluid = TRUE,
@@ -78,10 +94,10 @@ ui = fluidPage(
                  actionButton("reset_normal_area", "Reset")
                ),
                mainPanel(
-                 plotOutput(outputId = "area_normal"),
                  div(textOutput("txt_out"), 
                      align = "center", 
-                     style = "font-size:200%;")
+                     style = "font-size:200%;"),
+                 plotOutput(outputId = "area_normal")
                )
              )
     ),
