@@ -27,11 +27,16 @@ ui = fluidPage(
                                label = strong("Show normal approximation (green)"),
                                value = FALSE),
                  checkboxInput(inputId = "binom_checkbox_table",
-                               label = strong("Show Binomial table"),
+                               label = strong("Table of Binomial Distribution"),
                                value = FALSE),
                  br(),
                  br(),
-                 actionButton("reset_binom", "Reset")
+                 actionButton("reset_binom", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
                ),
                mainPanel(
                  fluidRow(
@@ -39,6 +44,8 @@ ui = fluidPage(
                      plotOutput(outputId = "dist_binomial"),
                      conditionalPanel(
                        condition = ("input.binom_checkbox_table == 1"),
+                       div(htmlOutput("binomial_table_txt"), 
+                           style = "font-size:125%;"),
                        p("The numbers in the table represent the number of 
                          successes x out of n, probability p of success, pmf 
                          for probability mass function P(X=x) (binomial 
@@ -52,8 +59,8 @@ ui = fluidPage(
              )
     ),
     tabPanel("Normal", fluid = TRUE,
-             titlePanel(div(HTML("Normal distribution N(mu, sigma<sup>2</sup>)"
-                                 ))),
+             titlePanel(
+               div(HTML("Normal distribution N(mu, sigma<sup>2</sup>)"))),
              sidebarLayout(
                sidebarPanel(
                  sliderInput(inputId = "normal_mu",
@@ -69,7 +76,12 @@ ui = fluidPage(
                              step = 0.01),
                  br(),
                  br(),
-                 actionButton("reset_normal", "Reset")
+                 actionButton("reset_normal", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
                ),
                mainPanel(fluidRow(
                  verticalLayout( 
@@ -78,15 +90,15 @@ ui = fluidPage(
                        style = "font-size:115%;"),
                    plotOutput("dist_normal1"), 
                    plotOutput("dist_normal2")
-
                  )
                )
                )
-               
-               
              )
     ),
+    # Normal (area) -----------------------------------------------------------
     tabPanel("Normal (area)", fluid = TRUE,
+             titlePanel("Calculation of the area under the normal 
+                        distribution curve"),
              sidebarLayout(
                sidebarPanel(
                  numericInput("n_mean", "Mean", "0",
@@ -95,42 +107,87 @@ ui = fluidPage(
                               step = 0.01),
                  
                  selectInput("n_area", "Area", 
-                             choices = list("middle" = 1, "lower tail" = 2,
-                                            "upper tail" = 3), selected = 1),
+                             choices = list("middle" = 1, 
+                                            "lower tail" = 2,
+                                            "upper tail" = 3,
+                                            "both tails" = 4), selected = 1),
                  br(), br(), br(),
-                 numericInput("lbound", "Lower bound", "-1",
-                              step = 0.1),
-                 numericInput("ubound", "Upper bound", "1",
-                              step = 0.1),
+                 conditionalPanel(
+                   condition = ("input.n_area == 1 | 
+                                input.n_area == 3 |
+                                input.n_area == 4"),
+                   numericInput("lbound", "Lower bound", "-1",
+                                step = 0.1)),
+                 
+                 conditionalPanel(
+                   condition = ("input.n_area == 1 | 
+                                input.n_area == 2 |
+                                input.n_area == 4"),
+                   numericInput("ubound", "Upper bound", "1",
+                                step = 0.1)),
                  br(),
                  br(),
-                 actionButton("reset_normal_area", "Reset")
+                 actionButton("reset_normal_area", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
                ),
                mainPanel(
-                 div(textOutput("txt_out"), 
+                 div(htmlOutput("txt_out"), 
                      align = "center", 
-                     style = "font-size:200%;"),
+                     style = "font-size:125%;"),
                  plotOutput(outputId = "area_normal")
                )
              )
     ),
     tabPanel("t", fluid = TRUE,
+             titlePanel(
+               div(HTML("t distribution t<sub>df</sub>"))),
              sidebarLayout(
                sidebarPanel(
                  sliderInput(inputId = "t_df",
                              label = "Degree of freedom (df)",
                              min = 1,
-                             max = 100,
+                             max = 150,
                              value = 1),
                  br(),
+                 checkboxInput(inputId = "t_checkbox_table",
+                               label = strong("Table of t Distribution"),
+                               value = FALSE),
                  br(),
-                 actionButton("reset_t", "Reset")
+                 br(),
+                 br(),
+                 actionButton("reset_t", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
                ),
-               mainPanel(
-                 plotOutput(outputId = "dist_t")
+               mainPanel(fluidRow(
+                 verticalLayout( 
+                   div(htmlOutput("dist_t_txt"), 
+                       align = "center", 
+                       style = "font-size:115%;"),
+                   plotOutput("dist_t1"), 
+                   plotOutput("dist_t2"),
+                   conditionalPanel(
+                     condition = ("input.t_checkbox_table == 1"),
+                     div(htmlOutput("t_table_txt"), 
+                         style = "font-size:125%;"),
+                     p("The numbers in the table represent value x, 
+                         degree of freedom df,
+                         pdf for t distribution,
+                         cdf for t distribution, and
+                         pdf_snormal and cdf_snormal for standard normal."),
+                     DT::dataTableOutput("t_table")
+                   )
+                 )
+               )
                )
              )
     )
   )
 )
-
