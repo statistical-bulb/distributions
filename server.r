@@ -1,12 +1,11 @@
 ###########################################################################
 # R shiny app distributions
 # Sven Knüppel
-# 2019-03-22
+# 2019-03-25
 # under construction
 #
 
 library(shiny)
-library(data.table)
 library(DT)
 
 col1 <- "#FFBF00" # dark color amber #FFBF00
@@ -17,7 +16,7 @@ server <- function(input, output, session) {
   
   # Binomial distribution ---------------------------------------------------
   output$dist_binomial <- renderPlot({
-    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2)
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     n <- input$binom_n
     p <- input$binom_p
     x <- 0:n
@@ -27,10 +26,10 @@ server <- function(input, output, session) {
          type = "h",
          lwd = 4,
          col = col1,
-         xlab = "k",
-         ylab = "Probability"
+         xlab = "x",
+         ylab = "Binomial probability"
     )
-    if (input$binom_checkbox) {
+    if (input$binom_checkbox_normal) {
       curve(dnorm(x,
                   mean = n * p,
                   sd = sqrt(n * p * (1 - p))
@@ -48,7 +47,7 @@ server <- function(input, output, session) {
     x <- 0:n    
     binomial_data <- datatable(
       data.frame(
-        k = x, 
+        x = x, 
         n = n,
         p = p,
         pmf = dbinom(0:n, size = n, prob = p),
@@ -56,9 +55,9 @@ server <- function(input, output, session) {
         
       ), 
       options = list(searching = FALSE,
-                     rownames = FALSE,
                      paging = FALSE
-                     )
+      ), 
+      rownames = FALSE
     )%>%
       formatRound(c(4:7), 6) 
   }
@@ -67,13 +66,14 @@ server <- function(input, output, session) {
   observeEvent(input$reset_binom, {
     updateSliderInput(session, "binom_n", value = 30)
     updateSliderInput(session, "binom_p", value = 0.5)
-    updateCheckboxInput(session, "binom_checkbox", value = FALSE)
+    updateCheckboxInput(session, "binom_checkbox_normal", value = FALSE)
+    updateCheckboxInput(session, "binom_checkbox_table", value = FALSE)
   })
   
   # Normal distribution -----------------------------------------------------
   
   output$dist_normal1 <- renderPlot({
-    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2)
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # N(mu, sigma)
     mu <- input$normal_mu
     sigma <- input$normal_sigma
@@ -90,9 +90,9 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Probability-density function (pdf)",
-         xlab = "",
+         xlab = "x",
          ylab = "Density",
-         font.lab = 2 
+         font.lab = 2
     )
     # add standard normal distribution
     lines(
@@ -117,7 +117,7 @@ server <- function(input, output, session) {
   })   
   
   output$dist_normal2 <- renderPlot({
-    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2)
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # N(mu, sigma)
     mu <- input$normal_mu
     sigma <- input$normal_sigma
@@ -131,8 +131,8 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Cumulative density function (cdf)",
-         xlab = "",
-         ylab = expression(bold(paste(phi, "(x)"))),
+         xlab = "x",
+         ylab = "Probability",
          font.lab = 2,
          cex = 3
     )
@@ -157,9 +157,13 @@ server <- function(input, output, session) {
   })
   
   output$dist_normal_txt <- renderText({
-    text <- "grey standard normal distribution"
-    text
-  })
+    mu <- input$normal_mu;
+    sigma2 <- round(input$normal_sigma^2, 1);
+    paste0(
+    "<font color='#FFE5B4'><b>Standard normal distribution N(0,1)</b></font><br>
+    <font color='#FFBF00'><b>Normal distribution N(",
+    mu, ",", sigma2, ")</b></font>")
+    })
   
   # Reset button normal distribution
   observeEvent(input$reset_normal, {
@@ -169,7 +173,7 @@ server <- function(input, output, session) {
   
   # Normal distribution area ------------------------------------------------
   output$area_normal <- renderPlot({
-    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2)
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # N(mu, sigma)
     validate(
       need(!is.na(input$n_mean), 
@@ -231,7 +235,7 @@ server <- function(input, output, session) {
   
   # t distribution -----------------------------------------------------
   output$dist_t <- renderPlot({
-    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2)
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # t(df)
     t_df <- input$t_df
     x <- seq(-4, 4, length = 100)

@@ -1,7 +1,7 @@
 ###########################################################################
 # R shiny app distributions
 # Sven Knüppel
-# 2019-03-22
+# 2019-03-25
 # under construction
 #
 
@@ -10,22 +10,24 @@ library(shiny)
 ui = fluidPage(
   tabsetPanel(
     tabPanel("Binomial", fluid = TRUE,
-             
              titlePanel("Binomial distribution B(n, p)"),
              sidebarLayout(
                sidebarPanel(
                  sliderInput(inputId = "binom_n",
                              label = "Size n",
                              min = 1,
-                             max = 300,
+                             max = 100,
                              value = 30),
                  sliderInput(inputId = "binom_p",
                              label = "Probability p",
                              min = 0,
                              max = 1,
                              value = 0.5),
-                 checkboxInput(inputId = "binom_checkbox",
+                 checkboxInput(inputId = "binom_checkbox_normal",
                                label = strong("Show normal approximation (green)"),
+                               value = FALSE),
+                 checkboxInput(inputId = "binom_checkbox_table",
+                               label = strong("Show Binomial table"),
                                value = FALSE),
                  br(),
                  br(),
@@ -35,13 +37,23 @@ ui = fluidPage(
                  fluidRow(
                    verticalLayout( 
                      plotOutput(outputId = "dist_binomial"),
-                     DT::dataTableOutput("binomial_table")
+                     conditionalPanel(
+                       condition = ("input.binom_checkbox_table == 1"),
+                       p("The numbers in the table represent the number of 
+                         successes x out of n, probability p of success, pmf 
+                         for probability mass function P(X=x) (binomial 
+                         probabilities) and cdf for cumulative density 
+                         function P(X <= x)."),
+                       DT::dataTableOutput("binomial_table")
+                     )
                    )
                  )
                )
              )
     ),
     tabPanel("Normal", fluid = TRUE,
+             titlePanel(div(HTML("Normal distribution N(mu, sigma<sup>2</sup>)"
+                                 ))),
              sidebarLayout(
                sidebarPanel(
                  sliderInput(inputId = "normal_mu",
@@ -61,11 +73,12 @@ ui = fluidPage(
                ),
                mainPanel(fluidRow(
                  verticalLayout( 
-                   plotOutput("dist_normal1"), 
-                   plotOutput("dist_normal2"),
-                   div(textOutput("dist_normal_txt"), 
+                   div(htmlOutput("dist_normal_txt"), 
                        align = "center", 
-                       style = "font-size:75%;")
+                       style = "font-size:115%;"),
+                   plotOutput("dist_normal1"), 
+                   plotOutput("dist_normal2")
+
                  )
                )
                )
