@@ -72,7 +72,7 @@ ui = fluidPage(
                              label = "Standard deviation",
                              min = 0.1,
                              max = 10,
-                             value = 1,
+                             value = 2,
                              step = 0.01),
                  br(),
                  br(),
@@ -105,7 +105,6 @@ ui = fluidPage(
                               step = 0.1),
                  numericInput("n_sd", "Standard deviation", "1", min = 0.01,
                               step = 0.01),
-                 
                  selectInput("n_area", "Area", 
                              choices = list("middle" = 1, 
                                             "lower tail" = 2,
@@ -142,6 +141,7 @@ ui = fluidPage(
                )
              )
     ),
+    # t distribution ------------------------------------------------------
     tabPanel("t", fluid = TRUE,
              titlePanel(
                div(HTML("t distribution t<sub>df</sub>"))),
@@ -186,6 +186,51 @@ ui = fluidPage(
                    )
                  )
                )
+               )
+             )
+    ),
+    # t (area) -----------------------------------------------------------
+    tabPanel("t (area)", fluid = TRUE,
+             titlePanel("Calculation of the area under the t 
+                        distribution curve"),
+             sidebarLayout(
+               sidebarPanel(
+                 numericInput("t_df2", "Degree of freedom (df)", "1",
+                              min = 1,
+                              step = 1),
+                 selectInput("t_area", "Area", 
+                             choices = list("middle" = 1, 
+                                            "lower tail" = 2,
+                                            "upper tail" = 3,
+                                            "both tails" = 4), selected = 1),
+                 br(), br(), br(),
+                 conditionalPanel(
+                   condition = ("input.t_area == 1 | 
+                                input.t_area == 3 |
+                                input.t_area == 4"),
+                   numericInput("lbound_t", "Lower bound", "-1",
+                                step = 0.1)),
+                 
+                 conditionalPanel(
+                   condition = ("input.t_area == 1 | 
+                                input.t_area == 2 |
+                                input.t_area == 4"),
+                   numericInput("ubound_t", "Upper bound", "1",
+                                step = 0.1)),
+                 br(),
+                 br(),
+                 actionButton("reset_t_area", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
+               ),
+               mainPanel(
+                 div(htmlOutput("txt_out_t"), 
+                     align = "center", 
+                     style = "font-size:125%;"),
+                 plotOutput(outputId = "area_t")
                )
              )
     )
