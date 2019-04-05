@@ -9,3 +9,8 @@ required_lib <- c("shiny", "DT")
 new_lib <- required_lib[!(required_lib %in% installed.packages()[, "Package"])]
 
 if(length(new_lib)) install.packages(new_lib, dependencies = TRUE)
+
+Run in RStudio
+
+shiny::runGitHub( "distributions", "statistical-bulb") 
+
