@@ -12,7 +12,6 @@ col1 <- "#FFBF00" # dark color amber #FFBF00
 col2 <- "#FFE5B4" # light color peach #FFE5B4
 
 server <- function(input, output, session) {
-  
   # Binomial distribution ---------------------------------------------------
   output$dist_binomial <- renderPlot({
     par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
@@ -25,7 +24,7 @@ server <- function(input, output, session) {
          type = "h",
          lwd = 4,
          col = col1,
-         xlab = "x",
+         xlab = "",
          ylab = "Binomial probability"
     )
     if (input$binom_checkbox_normal) {
@@ -73,9 +72,178 @@ server <- function(input, output, session) {
     updateCheckboxInput(session, "binom_checkbox_normal", value = FALSE)
     updateCheckboxInput(session, "binom_checkbox_table", value = FALSE)
   })
+  # Binomial distribution area ------------------------------------------------
+  output$txt_out_b <- renderText({
+    validate(
+      need(!is.na(input$b_size_n), 
+           message = ""),
+      need(0 < input$b_size_n,
+           message = "<Size n> must be greater than zero"),
+      need(!is.na(input$b_p), 
+           message = ""),
+      need((0 <= input$b_p) | (input$b_p >= 1),
+           message = "The probability p must be between 0 and 1"),
+      need(!is.na(input$lbound_b), 
+           message = ""),
+      need(!is.na(input$ubound_b), 
+           message = ""),
+      need(0 <= input$lbound_b,
+           message = "<Lower bound> must be greater or equal than zero"),
+      need(0 <= input$ubound_b,
+           message = "<Upper bound> must be greater or equal than zero"),
+      need(input$lbound_b <=  input$b_size_n,
+           message = "<Lower bound> must be smaller or equal to <Size n>"),
+      need(input$ubound_b <= input$b_size_n,
+           message = "<Upper bound> must be smaller or equal to <Size n>"),
+      if (input$b_area == 1 | input$b_area == 4) {
+        need(input$lbound_b < input$ubound_b, 
+             message = "<Lower bound> must be smaller than <upper bound>")
+      }
+    )
+    n <- as.integer(input$b_size_n)
+    p <- input$b_p
+    lb <- as.integer(input$lbound_b)
+    ub <- as.integer(input$ubound_b)
+    if (input$n_area == 1) {
+      # middle
+      area <- 
+        paste0("X ~ Binom(", n, ", ", p, ")<br>P(", lb, " <= X <= ", ub , ") = ",
+               round(sum(dbinom(lb:ub, n, p)), 4))
+    }
+    if (input$b_area == 2) {
+      # lower tail
+      area <- 
+        paste0("X ~ Binom(", n, ", ", p, ")<br>P(X <= ", ub , ") = ",
+               round(sum(dbinom(0:ub, n, p)), 4))
+    }
+    if (input$b_area == 3) {
+      # upper tail
+      area <- 
+        paste0("X ~ Binom(", n, ", ", p, ")<br>P(", lb , " <= X) = ",
+               round(sum(dbinom(lb:n, n, p)), 4))
+    }
+    if (input$b_area == 4) {
+      # both
+      area <- 
+        paste0("X ~ Binom(", n, ", ", p, ")<br>P(X <= ", 
+               lb , " or ", ub, " <= X) = ", 
+               round(
+                 sum(dbinom(c(0:lb, ub:n), n, p)),
+                 4))
+    }
+    area <- paste0("<font color='#ff0000'><b>",
+                   area,
+                   "</b></font>")
+  })
+  
+  output$area_b <- renderPlot({
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
+    validate(
+      need(!is.na(input$b_size_n), 
+           message = ""),
+      need(0 < input$b_size_n,
+           message = "<Size n> must be greater than zero"),
+      need(!is.na(input$b_p), 
+           message = ""),
+      need((0 <= input$b_p) | (input$b_p >= 1),
+           message = "The probability p must be between 0 and 1"),
+      need(!is.na(input$lbound_b), 
+           message = ""),
+      need(!is.na(input$ubound_b), 
+           message = ""),
+      need(0 <= input$lbound_b,
+           message = "<Lower bound> must be greater or equal than zero"),
+      need(0 <= input$ubound_b,
+           message = "<Upper bound> must be greater or equal than zero"),
+      need(input$lbound_b <=  input$b_size_n,
+           message = "<Lower bound> must be smaller or equal to <Size n>"),
+      need(input$ubound_b <= input$b_size_n,
+           message = "<Upper bound> must be smaller or equal to <Size n>"),
+      if (input$b_area == 1 | input$b_area == 4) {
+        need(input$lbound_b < input$ubound_b, 
+             message = "<Lower bound> must be smaller than <upper bound>")
+      }
+    )
+    n <- as.integer(input$b_size_n)
+    p <- input$b_p
+    lb <- as.integer(input$lbound_b)
+    ub <- as.integer(input$ubound_b)
+    x <- 0:n
+    y <- dbinom(0:n, size = n, prob = p)
+    par(mar = c(5, 4, 1, 2) + 0.1)
+    plot(x, y,
+         type = "h",
+         lwd = 4,
+         col = col1,
+         xlab = "",
+         ylab = "Binomial probability"
+    )
+    
+    # plot area 
+    if (input$b_area == 1) {
+      # middle
+      xs_a <- seq(lb, ub, by = 1)
+      ys_a <- dbinom(xs_a, size = n, prob = p)
+      for (i in seq_along(xs_a)) {
+        lines(c(xs_a[i], xs_a[i]), 
+              c(0, ys_a[i]),
+              col = "red",
+              lwd = 5)  
+      }
+    }
+    if (input$b_area == 2) {
+      # lower tail
+      xs_a <- seq(0, ub, by = 1)
+      ys_a <- dbinom(xs_a, size = n, prob = p)
+      for (i in seq_along(xs_a)) {
+        lines(c(xs_a[i], xs_a[i]), 
+              c(0, ys_a[i]),
+              col = "red",
+              lwd = 5)  
+      }
+    }
+    if (input$b_area == 3) {
+      # upper tail
+      xs_a <- seq(lb, n, by = 1)
+      ys_a <- dbinom(xs_a, size = n, prob = p)
+      for (i in seq_along(xs_a)) {
+        lines(c(xs_a[i], xs_a[i]), 
+              c(0, ys_a[i]),
+              col = "red",
+              lwd = 5)  
+      }
+    }
+    if (input$b_area == 4) {
+      # both tails
+      xs_a1 <- seq(0, lb, by = 1)
+      ys_a1 <- dbinom(xs_a1, size = n, prob = p)
+      xs_a2 <- seq(ub, n, by = 1)
+      ys_a2 <- dbinom(xs_a2, size = n, prob = p)
+      
+      for (i in seq_along(xs_a1)) {
+        lines(c(xs_a1[i], xs_a1[i]), 
+              c(0, ys_a1[i]),
+              col = "red",
+              lwd = 5)  
+      }
+      for (i in seq_along(xs_a2)) {
+        lines(c(xs_a2[i], xs_a2[i]), 
+              c(0, ys_a2[i]),
+              col = "red",
+              lwd = 5)  
+      }
+    }
+  })
+  # Reset button normal area
+  observeEvent(input$reset_b_area, {
+    updateNumericInput(session, "b_size_n", value = 15)
+    updateNumericInput(session, "b_p", value = 0.5)
+    updateNumericInput(session, "b_area", value = 1)
+    updateNumericInput(session, "lbound_b", value = 5)
+    updateNumericInput(session, "ubound_b", value = 10)
+  })
   
   # Normal distribution -----------------------------------------------------
-  
   output$dist_normal1 <- renderPlot({
     par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # N(mu, sigma)
@@ -94,7 +262,7 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Probability-density function (pdf)",
-         xlab = "x",
+         xlab = "",
          ylab = "Density",
          font.lab = 2
     )
@@ -135,7 +303,7 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Cumulative density function (cdf)",
-         xlab = "x",
+         xlab = "",
          ylab = "Probability",
          font.lab = 2,
          cex = 3
@@ -259,7 +427,7 @@ server <- function(input, output, session) {
     op <- par(mar = c(5, 4, 0.1, 2) + 0.1)
     plot(x, y,
          type = "n", 
-         xlab = "x",
+         xlab = "",
          ylab = "density",
          xlim = range(x),
          ylim = c(0, max(y)),
@@ -366,7 +534,7 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Probability-density function (pdf)",
-         xlab = "x",
+         xlab = "",
          ylab = "Density",
          font.lab = 2
     )
@@ -397,7 +565,7 @@ server <- function(input, output, session) {
          lwd = 2,
          col = col2,
          main = "Cumulative density function (cdf)",
-         xlab = "x",
+         xlab = "",
          ylab = "Probability",
          font.lab = 2,
          cex = 3
@@ -472,7 +640,7 @@ server <- function(input, output, session) {
     if (input$t_area == 1) {
       # middle
       area <- 
-       paste0("P(", lb, " < T(df = ", t_df, ") < ", ub , ") = ",
+        paste0("P(", lb, " < T(df = ", t_df, ") < ", ub , ") = ",
                round(pt(ub, df = t_df) -  
                        pt(lb, df = t_df), 4))
     }
@@ -530,7 +698,7 @@ server <- function(input, output, session) {
     op <- par(mar = c(5, 4, 0.1, 2) + 0.1)
     plot(x, y,
          type = "n", 
-         xlab = "x",
+         xlab = "",
          ylab = "density",
          xlim = range(x),
          ylim = c(0, max(y)),

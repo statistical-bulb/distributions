@@ -58,6 +58,53 @@ ui = fluidPage(
                )
              )
     ),
+    # Binomial (area) -----------------------------------------------------------
+    tabPanel("Binomial (area)", fluid = TRUE,
+             titlePanel("Calculation of the area using the Binomial 
+                        model"),
+             sidebarLayout(
+               sidebarPanel(
+                 numericInput("b_size_n", "Size n", "15",
+                              step = 1),
+                 numericInput("b_p", "Probability p", "0.5", min = 0.01,
+                              step = 0.1),
+                 selectInput("b_area", "Area", 
+                             choices = list("middle" = 1, 
+                                            "lower tail" = 2,
+                                            "upper tail" = 3,
+                                            "both tails" = 4), selected = 1),
+                 br(), br(), br(),
+                 conditionalPanel(
+                   condition = ("input.b_area == 1 | 
+                                input.b_area == 3 |
+                                input.b_area == 4"),
+                   numericInput("lbound_b", "Lower bound", "5",
+                                step = 1)),
+                 
+                 conditionalPanel(
+                   condition = ("input.b_area == 1 | 
+                                input.b_area == 2 |
+                                input.b_area == 4"),
+                   numericInput("ubound_b", "Upper bound", "10",
+                                step = 1)),
+                 br(),
+                 br(),
+                 actionButton("reset_b_area", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
+                 ),
+               mainPanel(
+                 div(htmlOutput("txt_out_b"), 
+                     align = "center", 
+                     style = "font-size:125%;"),
+                 plotOutput(outputId = "area_b")
+               )
+               )
+             ),
+    # Normal distribution -------------------------------------------------
     tabPanel("Normal", fluid = TRUE,
              titlePanel(
                div(HTML("Normal distribution N(mu, sigma<sup>2</sup>)"))),
