@@ -95,15 +95,15 @@ ui = fluidPage(
                  helpText(a(href = "https://github.com/statistical-bulb/distributions", 
                             target = "_blank",
                             "Find code"))
-                 ),
+               ),
                mainPanel(
                  div(htmlOutput("txt_out_b"), 
                      align = "center", 
                      style = "font-size:125%;"),
                  plotOutput(outputId = "area_b")
                )
-               )
-             ),
+             )
+    ),
     # Normal distribution -------------------------------------------------
     tabPanel("Normal", fluid = TRUE,
              titlePanel(
@@ -278,6 +278,80 @@ ui = fluidPage(
                      align = "center", 
                      style = "font-size:125%;"),
                  plotOutput(outputId = "area_t")
+               )
+             )
+    ),
+    # chi2 distribution ------------------------------------------------------
+    tabPanel("Chi2", fluid = TRUE,
+             titlePanel(
+               div(HTML("Chi2 distribution &chi;<sup>2</sup>(df)"))),
+             sidebarLayout(
+               sidebarPanel(
+                 sliderInput(inputId = "chi2_df",
+                             label = "Degree of freedom (df)",
+                             min = 1,
+                             max = 150,
+                             value = 1),
+                 br(),
+                 br(),
+                 actionButton("reset_chi2", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
+               ),
+               mainPanel(fluidRow(
+                 verticalLayout( 
+                   plotOutput("dist_chi21"), 
+                   plotOutput("dist_chi22")
+                 )
+               )
+               )
+             )
+    ),
+    # chi2 (area) -----------------------------------------------------------
+    tabPanel("Chi2 (area)", fluid = TRUE,
+             titlePanel(div(HTML("Calculation of the area under the &chi;<sup>2</sup> 
+                      distribution curve"))),
+             sidebarLayout(
+               sidebarPanel(
+                 numericInput("chi2_df22", "Degree of freedom (df)", "1",
+                              min = 1,
+                              step = 1),
+                 selectInput("chi2_area", "Area", 
+                             choices = list("middle" = 1, 
+                                            "lower tail" = 2,
+                                            "upper tail" = 3,
+                                            "both tails" = 4), selected = 1),
+                 br(), br(), br(),
+                 conditionalPanel(
+                   condition = ("input.chi2_area == 1 | 
+                              input.chi2_area == 3 |
+                              input.chi2_area == 4"),
+                   numericInput("lbound_chi2", "Lower bound", "1",
+                                step = 0.1)),
+                 
+                 conditionalPanel(
+                   condition = ("input.chi2_area == 1 | 
+                              input.chi2_area == 2 |
+                              input.chi2_area == 4"),
+                   numericInput("ubound_chi2", "Upper bound", "3",
+                                step = 0.1)),
+                 br(),
+                 br(),
+                 actionButton("reset_chi2_area", "Reset"),
+                 br(),
+                 br(),
+                 helpText(a(href = "https://github.com/statistical-bulb/distributions", 
+                            target = "_blank",
+                            "Find code"))
+               ),
+               mainPanel(
+                 div(htmlOutput("txt_out_chi2"), 
+                     align = "center", 
+                     style = "font-size:125%;"),
+                 plotOutput(outputId = "area_chi2")
                )
              )
     )

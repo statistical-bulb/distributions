@@ -123,7 +123,7 @@ server <- function(input, output, session) {
                round(sum(dbinom(lb:n, n, p)), 4))
     }
     if (input$b_area == 4) {
-      # both
+      # both tails
       area <- 
         paste0("X ~ Binom(", n, ", ", p, ")<br>P(X <= ", 
                lb , " or ", ub, " <= X) = ", 
@@ -250,7 +250,7 @@ server <- function(input, output, session) {
     mu <- input$normal_mu
     sigma <- input$normal_sigma
     xs <- c(-4, 4, mu - 4 * sigma, mu + 4 * sigma)
-    x <- seq(min(xs), max(xs), length = 200)
+    x <- seq(min(xs), max(xs), length = 400)
     y <- dnorm(x, mean = mu, sd = sigma)
     # N(0, 1)
     yn <- dnorm(x, mean = 0, sd = 1)
@@ -294,7 +294,7 @@ server <- function(input, output, session) {
     mu <- input$normal_mu
     sigma <- input$normal_sigma
     xs <- c(-4, 4, mu - 4 * sigma, mu + 4 * sigma)
-    x <- seq(min(xs), max(xs), length = 200)
+    x <- seq(min(xs), max(xs), length = 400)
     y <- dnorm(x, mean = mu, sd = sigma)
     # N(0, 1)
     yn <- dnorm(x, mean = 0, sd = 1)
@@ -354,7 +354,7 @@ server <- function(input, output, session) {
       need(!is.na(input$lbound), 
            message = "input <Lower bound> should be numeric."),
       need(!is.na(input$ubound), 
-           message = "input <Lower bound> should be numeric."),
+           message = "input <Upper bound> should be numeric."),
       if (input$n_area == 1 | input$n_area == 4) {
         need(input$lbound <= input$ubound, 
              message = "input <Lower bound> should be smaller <Upper bound>.")
@@ -385,7 +385,7 @@ server <- function(input, output, session) {
                            lower.tail = FALSE), 4))
     }
     if (input$n_area == 4) {
-      # upper tail
+      # both tails
       area <- 
         paste0("P(X < ", lb , " or ", ub, " < X) = ", 
                round(
@@ -420,7 +420,7 @@ server <- function(input, output, session) {
     lb <- input$lbound
     ub <- input$ubound
     xs <- c(lb - 2, ub + 2, mu - 4 * sigma, mu + 4 * sigma)
-    x <- seq(min(xs), max(xs), length = 200)
+    x <- seq(min(xs), max(xs), length = 400)
     y <- dnorm(x, mean = mu, sd = sigma)
     
     # density function
@@ -469,7 +469,7 @@ server <- function(input, output, session) {
             col = col1)
     }
     if (input$n_area == 3) {
-      # lower tail
+      # upper tail
       xs_a <- seq(lb, max(xs), length.out = 400)
       ys_a <- dnorm(xs_a, mean = mu, sd = sigma)
       polygon(
@@ -523,7 +523,7 @@ server <- function(input, output, session) {
     par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # t(df)
     t_df <- input$t_df
-    x <- seq(-10, 10, length = 200)
+    x <- seq(-10, 10, length = 400)
     y <- dt(x, df = t_df)
     yn <- dnorm(x, mean = 0, sd = 1)
     # Density function
@@ -557,7 +557,7 @@ server <- function(input, output, session) {
     par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
     # t(df)
     t_df <- input$t_df2
-    x <- seq(-10, 10, length = 200)
+    x <- seq(-10, 10, length = 400)
     y <- dt(x, df = t_df)
     yn <- dnorm(x, mean = 0, sd = 1)
     plot(x, pnorm(x, mean = 0, sd = 1),
@@ -627,7 +627,7 @@ server <- function(input, output, session) {
       need(!is.na(input$lbound_t), 
            message = "input <Lower bound> should be numeric."),
       need(!is.na(input$ubound_t), 
-           message = "input <Lower bound> should be numeric."),
+           message = "input <Upper bound> should be numeric."),
       if (input$t_area == 1 | input$t_area == 4) {
         need(input$lbound_t <= input$ubound_t, 
              message = "input <Lower bound> should be smaller <Upper bound>.")
@@ -658,7 +658,7 @@ server <- function(input, output, session) {
                         lower.tail = FALSE), 4))
     }
     if (input$t_area == 4) {
-      # upper tail
+      # both tails
       area <- 
         paste0("P(T(df = ", t_df, ") < ", lb , " or ", ub, " < T(df = ", t_df, ") = ", 
                round(
@@ -681,7 +681,7 @@ server <- function(input, output, session) {
       need(!is.na(input$lbound_t), 
            message = "input <Lower bound> should be numeric."),
       need(!is.na(input$ubound_t), 
-           message = "input <Lower bound> should be numeric."),
+           message = "input <Upper bound> should be numeric."),
       if (input$t_area == 1 | input$t_area == 4) {
         need(input$lbound_t <= input$ubound_t, 
              message = "input <Lower bound> should be smaller <Upper bound>.")
@@ -691,7 +691,7 @@ server <- function(input, output, session) {
     lb <- input$lbound_t
     ub <- input$ubound_t
     xs <- c(lb - 2, ub + 2, - 4, 4)
-    x <- seq(min(xs), max(xs), length = 200)
+    x <- seq(min(xs), max(xs), length = 400)
     y <- dt(x, df = t_df)
     
     # density function
@@ -740,7 +740,7 @@ server <- function(input, output, session) {
             col = col1)
     }
     if (input$t_area == 3) {
-      # lower tail
+      # upper tail
       xs_a <- seq(lb, max(xs), length.out = 400)
       ys_a <- dt(xs_a, t_df)
       polygon(
@@ -787,5 +787,240 @@ server <- function(input, output, session) {
     updateNumericInput(session, "lbound_t", value = -1)
     updateNumericInput(session, "ubound_t", value = 1)
   })
+  # Chi2 distribution -----------------------------------------------------
+  output$dist_chi21 <- renderPlot({
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
+    par(mar = c(5, 4, 1, 2) + 0.2)
+    # chi2(df)
+    chi2_df <- input$chi2_df
+    xmax <- qchisq(0.975, df = chi2_df)
+    if (chi2_df >= 2) {
+      xmax <- qchisq(0.999, df = chi2_df)
+    }
+    x <- seq(0.001, xmax, length = 400)
+    y <- dchisq(x, df = chi2_df)
+    # Density function
+    plot(x, y,
+         type = "l",
+         xlim = c(0.001, xmax),
+         ylim = range(y),
+         lwd = 3,
+         col = col1,
+         main = "Probability-density function (pdf)",
+         xlab = "",
+         ylab = "Density",
+         font.lab = 2
+    )
+  }) 
+  output$dist_chi22 <- renderPlot({
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
+    par(mar = c(5, 4, 1, 2) + 0.2)
+    # chi2(df)
+    chi2_df <- input$chi2_df
+    xmax <- qchisq(0.975, df = chi2_df)
+    if (chi2_df >= 2) {
+      xmax <- qchisq(0.999, df = chi2_df)
+    }
+    x <- seq(0.001, xmax, length = 400)
+    y <- pchisq(x, df = chi2_df)
+    plot(x, y,
+         type = "l",
+         lwd = 2,
+         col = col1,
+         main = "Cumulative density function (cdf)",
+         xlab = "",
+         ylab = "Probability",
+         font.lab = 2,
+         cex = 3
+    )
+    
+  })
+  # Reset button t distribution
+  observeEvent(input$reset_chi2, {
+    updateSliderInput(session, "chi2_df", value = 1)
+  })
   
+  # Chi2 distribution area ------------------------------------------------
+  output$txt_out_chi2 <- renderText({
+    validate(
+      need(!is.na(input$chi2_df22), 
+           message = "input <df> should be integer."),
+      need(!(as.integer(input$chi2_df22) <= 0), 
+           message = "input <df> should be greater zero."),
+      need(!is.na(input$lbound_chi2), 
+           message = "input <Lower bound> should be numeric."),
+      need(!is.na(input$ubound_chi2), 
+           message = "input <Upper bound> should be numeric."),
+      need(!(input$lbound_chi2 <= 0), 
+           message = "input <Lower bound> should be greater zero."),
+      need(!(input$ubound_chi2 <= 0), 
+           message = "input <Upper bound> should be greater zero."),
+      if (input$chi2_area == 1 | input$chi2_area == 4) {
+        need(input$lbound_chi2 <= input$ubound_chi2, 
+             message = "input <Lower bound> should be smaller <Upper bound>.")
+      }
+    )
+    chi2_df <- as.integer(input$chi2_df22)
+    lb <- input$lbound_chi2
+    ub <- input$ubound_chi2
+    if (input$t_area == 1) {
+      # middle
+      area <- 
+        paste0("P(", lb, " < X2(df = ", chi2_df, ") < ", ub , ") = ",
+               round(pchisq(ub, df = chi2_df) -  
+                       pchisq(lb, df = chi2_df), 4))
+    }
+    if (input$chi2_area == 2) {
+      # lower tail
+      area <- 
+        paste0("P(X2(df = ", chi2_df, ") < ", ub , ") = ",
+               round(pchisq(ub, df = chi2_df), 4))
+    }
+    if (input$chi2_area == 3) {
+      # upper tail
+      area <- 
+        paste0("P(", lb , " < X2(df = ", chi2_df, ")) = ",
+               round(pchisq(lb, df = chi2_df,
+                            lower.tail = FALSE), 4))
+    }
+    if (input$chi2_area == 4) {
+      # both tails
+      area <- 
+        paste0("P(X2(df = ", chi2_df, ") < ", lb , " or ", ub, " < X2(df = ", chi2_df, ") = ", 
+               round(
+                 pchisq(lb, df = chi2_df) +
+                   pchisq(ub, df = chi2_df, lower.tail = FALSE),
+                 4))
+    }
+    area <- paste0("<font color='#FFBF00'><b>",
+                   area,
+                   "</b></font>")
+  })
+  
+  output$area_chi2 <- renderPlot({
+    par(cex.lab = 1.5, cex.axis = 1.2, font.lab = 2, font.axis = 2)
+    validate(
+      need(!is.na(input$chi2_df22), 
+           message = "input <df> should be integer."),
+      need(!(as.integer(input$chi2_df22) <= 0), 
+           message = "input <df> should be greater zero."),
+      need(!is.na(input$lbound_chi2), 
+           message = "input <Lower bound> should be numeric."),
+      need(!is.na(input$ubound_chi2), 
+           message = "input <Upper bound> should be numeric."),
+      need(!(input$lbound_chi2 <= 0), 
+           message = "input <Lower bound> should be greater zero."),
+      need(!(input$ubound_chi2 <= 0), 
+           message = "input <Upper bound> should be greater zero."),
+      if (input$chi2_area == 1 | input$chi2_area == 4) {
+        need(input$lbound_chi2 <= input$ubound_chi2, 
+             message = "input <Lower bound> should be smaller <Upper bound>.")
+      }
+    )
+    chi2_df <- as.integer(input$chi2_df22)
+    lb <- input$lbound_chi2
+    ub <- input$ubound_chi2
+    
+    xmax <- qchisq(0.975, df = chi2_df)
+    if (chi2_df >= 2) {
+      xmax <- qchisq(0.999, df = chi2_df)
+    }
+    xmax <- max(c(xmax, lb, ub))  # ?????????????????????????????
+    xmin <- min(c(0.001, lb, ub)) # ?????????????????????????????
+    x <- seq(xmin, xmax, length = 400)
+    y <- dchisq(x, df = chi2_df)
+    
+    # density function
+    op <- par(mar = c(5, 4, 0.1, 2) + 0.1)
+    plot(x, y,
+         type = "n", 
+         xlab = "",
+         ylab = "density",
+         xlim = c(xmin, xmax),
+         ylim = c(0, max(y)),
+         main = "",
+         font.lab = 2,
+         cex = 3
+    )
+    abline(h = 0)
+    
+    # plot area under the curve
+    if (input$chi2_area == 1) {
+      # middle
+      xs_a <- seq(lb, ub, length.out = 400)
+      ys_a <- dchisq(xs_a, df = chi2_df)
+      polygon(
+        x = c(lb, xs_a, ub),
+        y = c(0, ys_a, 0),
+        col = col2,
+        border = NA
+      )
+      # to make the curve more visible
+      lines(x, y,
+            lwd = 4,
+            col = col1)
+    }
+    if (input$chi2_area == 2) {
+      # lower tail
+      xs_a <- seq(min(x), ub, length.out = 400)
+      ys_a <- dchisq(xs_a, chi2_df)
+      polygon(
+        x = c(min(x), xs_a, ub),
+        y = c(0, ys_a, 0),
+        col = col2,
+        border = NA
+      )
+      # to make the curve more visible
+      lines(x, y,
+            lwd = 4,
+            col = col1)
+    }
+    if (input$chi2_area == 3) {
+      # upper tail
+      xs_a <- seq(lb, max(x), length.out = 400)
+      ys_a <- dchisq(xs_a, chi2_df)
+      polygon(
+        x = c(lb, xs_a, max(x)),
+        y = c(0, ys_a, 0),
+        col = col2,
+        border = NA
+      )
+      # to make the curve more visible
+      lines(x, y,
+            lwd = 4,
+            col = col1)
+    }
+    if (input$chi2_area == 4) {
+      # both tails
+      xs_a1 <- seq(min(x), lb, length.out = 400)
+      ys_a1 <- dchisq(xs_a1, df = chi2_df)
+      xs_a2 <- seq(ub, max(x), length.out = 400)
+      ys_a2 <- dchisq(xs_a2, chi2_df)
+      polygon(
+        x = c(min(x), xs_a1, lb),
+        y = c(0, ys_a1, 0),
+        col = col2,
+        border = NA
+      )
+      polygon(
+        x = c(ub, xs_a2, max(x)),
+        y = c(0, ys_a2, 0),
+        col = col2,
+        border = NA
+      )
+      # to make the curve more visible
+      lines(x, y,
+            lwd = 4,
+            col = col1)
+    }
+    
+    par(op)
+  })
+  # Reset button t area
+  observeEvent(input$reset_chi2_area, {
+    updateNumericInput(session, "chi2_df2", value = 1)
+    updateNumericInput(session, "chi2_area", value = 1)
+    updateNumericInput(session, "lbound_chi2", value = 1)
+    updateNumericInput(session, "ubound_chi2", value = 3)
+  })
 }
